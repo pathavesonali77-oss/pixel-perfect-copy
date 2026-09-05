@@ -90,6 +90,7 @@ export async function zaiChat(
     const key = await acquireBestKey(keys, PARALON_RPM, lastKey);
     lastKey = key;
     try {
+      const t0 = Date.now();
       const res = await fetch(CHAT_URL, {
         method: "POST",
         signal: AbortSignal.timeout(opts.timeoutMs ?? 150_000),
@@ -111,6 +112,7 @@ export async function zaiChat(
           messages,
         }),
       });
+      console.log(`[chat] status=${res.status} ${Date.now() - t0}ms attempt=${attempt}`);
       if (!res.ok) {
         lastErr = `${res.status} ${await res.text().catch(() => "")}`.slice(0, 300);
         // 401/403 = bad key, 400 = the request itself (usually too long) — both
